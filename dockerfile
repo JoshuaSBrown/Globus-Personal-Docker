@@ -30,27 +30,28 @@ RUN cd /root && \
 # Create directories and adjust permissions
 RUN mkdir -p /home/gridftp/globus_config/.globus && \
     mkdir -p /home/gridftp/globus_config/.globusonline && \
-    mkdir -p /home/gridftp/data && \
-    chown -R gridftp:gridftp /home/gridftp/globus_config && \
-    chown -R gridftp:gridftp /home/gridftp/data && \
-    chmod -R 755 /home/gridftp/globus_config && \
-    chmod -R 755 /home/gridftp/data
+    mkdir -p /home/gridftp/data
 
 # Copy the script into the container
 COPY globus-connect-personal.sh /home/gridftp/globus-connect-personal.sh
 COPY initialization.sh /home/gridftp/initialization.sh
 COPY entrypoint.sh ./entrypoint.sh
 
-# Make the script executable
-RUN chmod +x /home/gridftp/initialization.sh ./entrypoint.sh /home/gridftp/globus-connect-personal.sh
-
-# Use the entrypoint script
-ENTRYPOINT ["./entrypoint.sh"]
+# CRITICAL: Set proper permissions for any user to execute
+RUN chmod 755 /entrypoint.sh && \
+    chmod 755 /home/gridftp/initialization.sh && \
+    chmod 755 /home/gridftp/globus-connect-personal.sh && \
+    chmod -R 755 /home/gridftp && \
+    chmod 775 /home/gridftp && \
+    chown -R gridftp:root /home/gridftp && \
+    chmod 777 /home/gridftp/globus_config && \
+    chmod 777 /home/gridftp/data
 
 # globus-connect-server-setup script needs these
-ENV HOME=/root
 ENV TERM=xterm
-
-# Set default value for RUN_SETUP_SCRIPT
+ENV HOME=/home/gridftp
 ENV START_GLOBUS=false
 
+WORKDIR /home/gridftp
+# Use the entrypoint script
+ENTRYPOINT ["/entrypoint.sh"]

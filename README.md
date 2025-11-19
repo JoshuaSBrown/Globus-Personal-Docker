@@ -34,3 +34,34 @@ docker run -e DataPath="$DataPath"  \
            -v "$DataPath":/home/gridftp/data \
            -it globus
 ```
+
+## Common Problems - Failed setup command
+
+If the first `docker run` command fails with errors like:
+
+```
+cp: cannot create directory '/home/gridftp/globus_config/.globus': Permission denied
+cp: cannot create directory '/home/gridftp/globus_config/.globusonline': Permission denied
+cp: cannot create directory '/home/gridftp/globus_config/.globus': Permission denied
+cp: cannot create directory '/home/gridftp/globus_config/.globusonline': Permission denied
+```
+
+the likely cause is a mismatch between the gridftp user inside the container
+and the host user running Docker. You can check your host UID with:
+
+```
+id -u
+```
+
+If it is not 1000, this mismatch can prevent proper file access in the mounted
+data volume. By default, Docker maps the container’s gridftp and root users to
+UID 1000 on the host. This works only if the host user also has UID 1000.
+Otherwise, you need to mount a compatible passwd file into the container.
+
+Create the file using the helper script:
+
+```
+./generate_passwd.sh
+```
+
+Then, in the Running the container section, add the following flags to docker run: `-u $(id -u):0 -v ./passwd:/etc/passwd`.
