@@ -2,9 +2,9 @@
 
 if [ "$START_GLOBUS" = "true" ]; then
     echo "Starting Globus Connect Personal"
-    source ./globus-connect-personal.sh
+    source /home/gridftp/globus-connect-personal.sh
 else
-    source ./initialization.sh
+    source /home/gridftp/initialization.sh
 fi
 
 echo setup complete
