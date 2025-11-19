@@ -64,4 +64,4 @@ Create the file using the helper script:
 ./generate_passwd.sh
 ```
 
-Then, in the Running the container section, add the following flags to docker run: `-u $(id -u):0 -v ./passwd:/etc/passwd`.
+Then, in the Running the container section, add the following flags to docker run: `-u $(id -u):0 -v ./passwd:/etc/passwd:ro`.
